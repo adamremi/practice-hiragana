@@ -27,7 +27,7 @@ def get_answer():
         correct_answers += 1
         list_of_keys.remove(character)
         remaining_questions = total_questions - correct_answers
-        feedback_label.config(text=f"correct! {remaining_questions}/{total_questions} characters remaining", bg="#8ce99a")
+        feedback_label.config(text=f"Correct! {remaining_questions}/{total_questions} characters remaining", bg="#8ce99a")
     else:
         remaining_questions = total_questions - correct_answers
         feedback_label.config(text=f"Incorrect! the reading is for {character} is '{data['hiragana'][character]}'", bg="#fa5252")

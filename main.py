@@ -7,6 +7,7 @@ def start_test():
     global list_of_keys
     global character
     global correct_answers
+    global incorrect_answers
     global total_questions
     with open("kana.json", "r") as file:
         data = json.load(file)
@@ -14,6 +15,7 @@ def start_test():
         character = random.choice(list_of_keys)
         question_label.config(text=character)
     correct_answers = 0
+    incorrect_answers = 0
     total_questions = len(list_of_keys)
     feedback_label.config(text="", bg="#fff0f6")
 
@@ -21,7 +23,7 @@ def start_test():
 def get_answer():
     global character
     global correct_answers
-    global total_questions
+    global incorrect_answers
     answer = answer_entry.get().lower()
     if answer == data["hiragana"][character]:
         correct_answers += 1
@@ -29,6 +31,7 @@ def get_answer():
         remaining_questions = total_questions - correct_answers
         feedback_label.config(text=f"Correct! {remaining_questions}/{total_questions} characters remaining", bg="#8ce99a")
     else:
+        incorrect_answers += 1
         remaining_questions = total_questions - correct_answers
         feedback_label.config(text=f"Incorrect! the reading is for {character} is '{data['hiragana'][character]}'", bg="#fa5252")
     answer_entry.delete(0, END)
@@ -42,10 +45,9 @@ def get_answer():
         question_label.config(text=character)
 
 def calculate_score():
-    global correct_answers
-    global total_questions
-    num = round(total_questions / correct_answers, 2)
-    return num * 100
+    correct_on_first_try = total_questions - incorrect_answers
+    accuracy_percentage = round((correct_on_first_try/total_questions) * 100, 2)
+    return accuracy_percentage
 
 # For binding the enter key to the same function as the submit button
 def enter_key(event):

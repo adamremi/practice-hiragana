@@ -2,6 +2,7 @@ from tkinter import *
 import json
 import random
 
+
 def start_test():
     global data
     global list_of_keys
@@ -13,11 +14,12 @@ def start_test():
         data = json.load(file)
         list_of_keys = list(data["hiragana"].keys())
         character = random.choice(list_of_keys)
-        question_label.config(text=character)
+        question_label.config(text=character, font=("Arial", 100))
     correct_answers = 0
     incorrect_answers = 0
     total_questions = len(list_of_keys)
     feedback_label.config(text="", bg="#fff0f6")
+    submit_button.config(state=NORMAL)
 
 
 def get_answer():
@@ -37,16 +39,17 @@ def get_answer():
     answer_entry.delete(0, END)
 
     if list_of_keys == []:
-        question_label.config(text="You've finished!")
-        feedback_label.config(text=f"{calculate_score()}% correct")
+        question_label.config(text="You've finished!", font=("Arial", 40))
+        feedback_label.config(text=f"{calculate_score()}% correct", bg="#fff0f6")
         submit_button.config(state=DISABLED)
     else:
         character = random.choice(list_of_keys)
         question_label.config(text=character)
 
+
 def calculate_score():
-    correct_on_first_try = total_questions - incorrect_answers
-    accuracy_percentage = round((correct_on_first_try/total_questions) * 100, 2)
+    answered_correctly = total_questions - incorrect_answers
+    accuracy_percentage = round((answered_correctly/total_questions) * 100, 2)
     return accuracy_percentage
 
 # For binding the enter key to the same function as the submit button
@@ -57,7 +60,7 @@ def enter_key(event):
 # ------------- Window Object ------------------
 root = Tk()
 root.title("Practice Hiragana")
-root.minsize(600, 500)
+root.minsize(620, 500)
 root.config(padx=40, pady=40, bg="#fff0f6")
 root.bind('<Return>', enter_key)
 

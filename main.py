@@ -1,56 +1,39 @@
 from tkinter import *
-import json
-import random
+from test import *
 
 
 def start_test():
-    global data
-    global list_of_keys
-    global character
-    global correct_answers
-    global incorrect_answers
-    global total_questions
-    with open("kana.json", "r") as file:
-        data = json.load(file)
-        list_of_keys = list(data["hiragana"].keys())
-        character = random.choice(list_of_keys)
-        question_label.config(text=character, font=("Arial", 100))
-    correct_answers = 0
-    incorrect_answers = 0
-    total_questions = len(list_of_keys)
-    feedback_label.config(text="", bg="#fff0f6")
+    global test
+    test = Test()
+    question_label.config(text=test.character, font=("Arial", 100))
     submit_button.config(state=NORMAL)
 
 
 def get_answer():
-    global character
-    global correct_answers
-    global incorrect_answers
-    answer = answer_entry.get().lower()
-    if answer == data["hiragana"][character]:
-        correct_answers += 1
-        list_of_keys.remove(character)
-        remaining_questions = total_questions - correct_answers
-        feedback_label.config(text=f"Correct! {remaining_questions}/{total_questions} characters remaining", bg="#8ce99a")
+    test_finished = test.check_if_finished()
+    if test_finished:
+        test_results()
     else:
-        incorrect_answers += 1
-        remaining_questions = total_questions - correct_answers
-        feedback_label.config(text=f"Incorrect! the reading is for {character} is '{data['hiragana'][character]}'", bg="#fa5252")
-    answer_entry.delete(0, END)
+        answer = answer_entry.get().lower()
+        feedback = test.process_answer(answer)
+        if "Incorrect" in feedback:
+            feedback_label.config(text=feedback, bg="#fa5252")
+        else:
+            feedback_label.config(text=feedback, bg="#8ce99a")
+        # Checking to see if the test is done again in order to avoid an IndexError
+        if test.check_if_finished():
+            test_results()
+        else:
+            test.character = random.choice(test.list_of_keys)
+            question_label.config(text=test.character)
 
-    if list_of_keys == []:
-        question_label.config(text="You've finished!", font=("Arial", 40))
-        feedback_label.config(text=f"{calculate_score()}% correct", bg="#fff0f6")
-        submit_button.config(state=DISABLED)
-    else:
-        character = random.choice(list_of_keys)
-        question_label.config(text=character)
+        answer_entry.delete(0, END)
 
 
-def calculate_score():
-    answered_correctly = total_questions - incorrect_answers
-    accuracy_percentage = round((answered_correctly/total_questions) * 100, 2)
-    return accuracy_percentage
+def test_results():
+    question_label.config(text="You've finished!", font=("Arial", 40))
+    feedback_label.config(text=f"{test.score()}% correct", bg="#fff0f6")
+    submit_button.config(state=DISABLED)
 
 # For binding the enter key to the same function as the submit button
 def enter_key(event):
@@ -61,7 +44,7 @@ def enter_key(event):
 root = Tk()
 root.title("Practice Hiragana")
 root.minsize(620, 500)
-root.config(padx=40, pady=40, bg="#fff0f6")
+root.config(padx=100, pady=40, bg="#fff0f6")
 root.bind('<Return>', enter_key)
 
 # Labels
@@ -83,4 +66,3 @@ reset_button = Button(text="Begin/Reset", width=10, font=("Arial", 24), command=
 reset_button.grid(row=4, column=2, pady=10)
 
 root.mainloop()
-
